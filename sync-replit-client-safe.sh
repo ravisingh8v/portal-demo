@@ -50,13 +50,13 @@ fi
 # STEP 4 — CLEAN OLD FRONTEND (optional)
 # -----------------------
 if [ -d "./src" ]; then
-  read -p "🧹 Remove existing './src' before copying new one? (y/n): " confirm
-  if [[ $confirm =~ ^[Yy]$ ]]; then
+  # read -p "🧹 Remove existing './src' before copying new one? (y/n): " confirm
+  # if [[ $confirm =~ ^[Yy]$ ]]; then
     rm -rf ./src
     echo "✅ Old './src' removed."
-  else
-    echo "⚠️ Keeping existing './src'. Some files may overlap."
-  fi
+  # else
+    # echo "⚠️ Keeping existing './src'. Some files may overlap."
+  # fi
 fi
 
 # -----------------------
