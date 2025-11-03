@@ -119,32 +119,29 @@ rm -rf "$TEMP_DIR" || true
 # -----------------------
 # STEP 8 — COMMIT CHANGES
 # -----------------------
-git add -A
-git status --short
+# Ask for review before commit
+read -p "🧐 Do you want to review the pulled changes before committing? (y/n): " REVIEW_CHOICE
 
-read -p "💬 Enter commit message (leave blank for default): " msg
-if [ -z "$msg" ]; then
-  msg="Sync frontend from replit ($REPLIT_BRANCH) on $TIMESTAMP"
+if [[ "$REVIEW_CHOICE" == "y" || "$REVIEW_CHOICE" == "Y" ]]; then
+  echo "✅ Please review your changes now. Use:"
+  echo "   git status"
+  echo "   git diff"
+  echo "🕐 Once you're done reviewing, press 'y' to continue or 'n' to abort."
+  
+  read -p "Continue with commit and push? (y/n): " CONTINUE_CHOICE
+  if [[ "$CONTINUE_CHOICE" != "y" && "$CONTINUE_CHOICE" != "Y" ]]; then
+    echo "❌ Aborting sync as per user choice."
+    exit 0
+  fi
 fi
 
-if git diff --cached --quiet; then
-  echo "⚠️ No changes to commit."
-else
-  git commit -m "$msg"
-  echo "✅ Committed: $msg"
-fi
+# Ask for custom commit message
+read -p "💬 Enter commit message (or press Enter for default): " COMMIT_MSG
+COMMIT_MSG=${COMMIT_MSG:-$COMMIT_MSG_DEFAULT}
 
-# -----------------------
-# STEP 9 — OPTIONAL PUSH
-# -----------------------
-read -p "🚀 Push changes to origin/$CURRENT_BRANCH now? (y/n): " push_now
-if [[ $push_now =~ ^[Yy]$ ]]; then
-  git push origin "$CURRENT_BRANCH"
-  echo "✅ Pushed to origin/$CURRENT_BRANCH"
-else
-  echo "⏭ Skipped push. You can do it later."
-fi
+echo "💾 Committing and pushing changes..."
+git add .
+git commit -m "$COMMIT_MSG"
+git push origin $(git branch --show-current)
 
-echo "====================================================="
-echo "🎉 Sync complete. Your './src' now contains Replit client code."
-echo "====================================================="
+echo "✅ Sync complete: $(git branch --show-current) branch updated."
