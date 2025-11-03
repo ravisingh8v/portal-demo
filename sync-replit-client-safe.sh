@@ -91,9 +91,7 @@ rm -rf "$CLIENT_DIR"
 # -----------------------
 # STEP 6 — REMOVE BACKEND FILES
 # -----------------------
-echo ""
-read -p "🧹 Remove backend files/folders from root (server, drizzle, etc)? (y/n): " remove_backend
-if [[ $remove_backend =~ ^[Yy]$ ]]; then
+echo "Removing backend files/folders from root..."
   for folder in "${REMOVE_FOLDERS[@]}"; do
     if [ -d "./$folder" ]; then
       rm -rf "./$folder"
@@ -107,8 +105,7 @@ if [[ $remove_backend =~ ^[Yy]$ ]]; then
       echo "Removed file: $file"
     fi
   done
-fi
-
+  
 # -----------------------
 # STEP 7 — CLEANUP
 # -----------------------
@@ -130,7 +127,7 @@ if [[ "$REVIEW_CHOICE" == "y" || "$REVIEW_CHOICE" == "Y" ]]; then
   
   read -p "Continue with commit and push? (y/n): " CONTINUE_CHOICE
   if [[ "$CONTINUE_CHOICE" != "y" && "$CONTINUE_CHOICE" != "Y" ]]; then
-    echo "❌ Aborting sync as per user choice."
+    echo "❌ Aborting sync as per your choice."
     exit 0
   fi
 fi
