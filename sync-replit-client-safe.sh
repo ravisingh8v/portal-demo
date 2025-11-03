@@ -6,6 +6,7 @@ set -o pipefail
 # CONFIG
 # -----------------------
 REPLIT_BRANCH="replit"
+DEVELOP_BRANCH="develop"
 CLIENT_DIR="client"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
@@ -28,11 +29,38 @@ if ! git diff-index --quiet HEAD --; then
 fi
 
 # -----------------------
-# STEP 2 — FETCH AND PREP TEMP WORKTREE
+# STEP 2 — UPDATE DEVELOP BRANCH LOCALLY
 # -----------------------
-echo "📦 Fetching latest '$REPLIT_BRANCH'..."
-git fetch origin "$REPLIT_BRANCH"
+echo "📦 Fetching latest branches..."
+git fetch origin "$REPLIT_BRANCH" "$DEVELOP_BRANCH" || {
+  echo "❌ Failed to fetch branches. Check your network or branch names."
+  exit 1
+}
 
+echo "🔄 Pulling latest '$DEVELOP_BRANCH' into your current branch ($CURRENT_BRANCH)..."
+if git show-ref --verify --quiet "refs/heads/$DEVELOP_BRANCH"; then
+  git checkout "$DEVELOP_BRANCH"
+  if ! git pull origin "$DEVELOP_BRANCH"; then
+    echo "❌ Merge conflict or pull error in '$DEVELOP_BRANCH'. Resolve manually before continuing."
+    exit 1
+  fi
+else
+  echo "⚠️  Local '$DEVELOP_BRANCH' branch not found. Creating it..."
+  git checkout -b "$DEVELOP_BRANCH" "origin/$DEVELOP_BRANCH"
+fi
+
+echo "🔁 Switching back to your working branch '$CURRENT_BRANCH'..."
+git checkout "$CURRENT_BRANCH"
+
+echo "⚙️  Merging latest '$DEVELOP_BRANCH' into '$CURRENT_BRANCH'..."
+if ! git merge "$DEVELOP_BRANCH" --no-edit; then
+  echo "❌ Merge conflict detected. Please resolve manually, then re-run this script."
+  exit 1
+fi
+
+
+
+# CREATE TEMP WORKTREE FOR REPLIT BRANCH
 echo "🧱 Creating temporary worktree at $TEMP_DIR"
 rm -rf "$TEMP_DIR" || true
 git worktree add "$TEMP_DIR" "origin/$REPLIT_BRANCH"
