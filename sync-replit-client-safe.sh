@@ -75,7 +75,7 @@ fi
 
 # Move public folder to root
 if [ -d "$TEMP_DIR/$CLIENT_DIR/public" ]; then
-  cp -R "$TEMP_DIR/$CLIENT_DIR/public/" ./public/
+  cp -R "$TEMP_DIR/$CLIENT_DIR/public/." ./public/
 fi
 
 # Copy any root-level frontend files (like vite.config, package.json partials)
