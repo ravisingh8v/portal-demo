@@ -86,6 +86,8 @@ for file in "$TEMP_DIR/$CLIENT_DIR"/*; do
   fi
 done
 
+rm -rf "$CLIENT_DIR"
+
 # -----------------------
 # STEP 6 — REMOVE BACKEND FILES
 # -----------------------
