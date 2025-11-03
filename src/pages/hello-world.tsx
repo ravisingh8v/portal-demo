@@ -40,7 +40,7 @@ export default function HelloWorld() {
               className="text-5xl font-black leading-none tracking-tight text-foreground md:text-7xl"
               data-testid="text-heading"
             >
-              Hello World Updated
+              Hello World Updated 2
             </h1>
 
             <p

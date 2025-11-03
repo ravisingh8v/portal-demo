@@ -50,13 +50,13 @@ fi
 # STEP 4 — CLEAN OLD FRONTEND (optional)
 # -----------------------
 if [ -d "./src" ]; then
-  read -p "🧹 Remove existing './src' before copying new one? (y/n): " confirm
-  if [[ $confirm =~ ^[Yy]$ ]]; then
+  # read -p "🧹 Remove existing './src' before copying new one? (y/n): " confirm
+  # if [[ $confirm =~ ^[Yy]$ ]]; then
     rm -rf ./src
     echo "✅ Old './src' removed."
-  else
-    echo "⚠️ Keeping existing './src'. Some files may overlap."
-  fi
+  # else
+    # echo "⚠️ Keeping existing './src'. Some files may overlap."
+  # fi
 fi
 
 # -----------------------
@@ -75,7 +75,7 @@ fi
 
 # Move public folder to root
 if [ -d "$TEMP_DIR/$CLIENT_DIR/public" ]; then
-  cp -R "$TEMP_DIR/$CLIENT_DIR/public" ./public
+  cp -R "$TEMP_DIR/$CLIENT_DIR/public/." ./public/
 fi
 
 # Copy any root-level frontend files (like vite.config, package.json partials)
@@ -91,9 +91,7 @@ rm -rf "$CLIENT_DIR"
 # -----------------------
 # STEP 6 — REMOVE BACKEND FILES
 # -----------------------
-echo ""
-read -p "🧹 Remove backend files/folders from root (server, drizzle, etc)? (y/n): " remove_backend
-if [[ $remove_backend =~ ^[Yy]$ ]]; then
+echo "Removing backend files/folders from root..."
   for folder in "${REMOVE_FOLDERS[@]}"; do
     if [ -d "./$folder" ]; then
       rm -rf "./$folder"
@@ -107,7 +105,6 @@ if [[ $remove_backend =~ ^[Yy]$ ]]; then
       echo "Removed file: $file"
     fi
   done
-fi
 
 # -----------------------
 # STEP 7 — CLEANUP
@@ -119,32 +116,29 @@ rm -rf "$TEMP_DIR" || true
 # -----------------------
 # STEP 8 — COMMIT CHANGES
 # -----------------------
-git add -A
-git status --short
+# Ask for review before commit
+read -p "🧐 Do you want to review the pulled changes before committing? (y/n): " REVIEW_CHOICE
 
-read -p "💬 Enter commit message (leave blank for default): " msg
-if [ -z "$msg" ]; then
-  msg="Sync frontend from replit ($REPLIT_BRANCH) on $TIMESTAMP"
+if [[ "$REVIEW_CHOICE" == "y" || "$REVIEW_CHOICE" == "Y" ]]; then
+  echo "✅ Please review your changes now. Use:"
+  echo "   git status"
+  echo "   git diff"
+  echo "🕐 Once you're done reviewing, press 'y' to continue or 'n' to abort."
+  
+  read -p "Continue with commit and push? (y/n): " CONTINUE_CHOICE
+  if [[ "$CONTINUE_CHOICE" != "y" && "$CONTINUE_CHOICE" != "Y" ]]; then
+    echo "❌ Aborting sync as per your choice."
+    exit 0
+  fi
 fi
 
-if git diff --cached --quiet; then
-  echo "⚠️ No changes to commit."
-else
-  git commit -m "$msg"
-  echo "✅ Committed: $msg"
-fi
+# Ask for custom commit message
+read -p "💬 Enter commit message (or press Enter for default): " COMMIT_MSG
+COMMIT_MSG=${COMMIT_MSG:-$COMMIT_MSG_DEFAULT}
 
-# -----------------------
-# STEP 9 — OPTIONAL PUSH
-# -----------------------
-read -p "🚀 Push changes to origin/$CURRENT_BRANCH now? (y/n): " push_now
-if [[ $push_now =~ ^[Yy]$ ]]; then
-  git push origin "$CURRENT_BRANCH"
-  echo "✅ Pushed to origin/$CURRENT_BRANCH"
-else
-  echo "⏭ Skipped push. You can do it later."
-fi
+echo "💾 Committing and pushing changes..."
+git add .
+git commit -m "$COMMIT_MSG"
+git push origin $(git branch --show-current)
 
-echo "====================================================="
-echo "🎉 Sync complete. Your './src' now contains Replit client code."
-echo "====================================================="
+echo "✅ Sync complete: $(git branch --show-current) branch updated."
