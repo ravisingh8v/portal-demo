@@ -1,5 +1,6 @@
-import HelloWorld from '../../pages/hello-world';
+import HelloWorld from "../../pages/hello-world";
 
 export default function HelloWorldExample() {
+  console.log("its change");
   return <HelloWorld />;
 }
