@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function HelloWorld() {
   const [clicked, setClicked] = useState(false);
+  console.log("hello");
   const handleGetStarted = () => {
     console.log("Get Started clicked");
     setClicked(true);
