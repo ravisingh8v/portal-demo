@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { log, serveStatic, setupVite } from "./vite";
 
 const app = express();
+console.log("error");
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
