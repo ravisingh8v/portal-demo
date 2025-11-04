@@ -1,7 +1,9 @@
 node_modules
 dist
 .DS_Store
+server/
 server
+.replit
 drizzle.config.ts
 vite.config.ts.*
 *.tar.gz
