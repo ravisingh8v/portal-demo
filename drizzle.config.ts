@@ -1,6 +1,7 @@
 import { defineConfig } from "drizzle-kit";
 
 if (!process.env.DATABASE_URL) {
+  console.log("changejddfbdv");
   throw new Error("DATABASE_URL, ensure the database is provisioned");
 }
 
