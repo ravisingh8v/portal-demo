@@ -8,7 +8,7 @@ echo "🔄 Fetching latest from $REPLIT_BRANCH..."
 git fetch origin "$REPLIT_BRANCH"
 
 echo "🔀 Merging $REPLIT_BRANCH into current branch..."
-git merge "origin/$REPLIT_BRANCH" --no-edit || true
+git merge "origin/$REPLIT_BRANCH" --allow-unrelated-histories --no-edit || true
 
 echo "🧹 Reverting unwanted files/folders to pre-merge state..."
 for path in "${DELETE_PATHS[@]}"; do
