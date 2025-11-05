@@ -146,7 +146,7 @@ echo "🧱 Creating temporary worktree at $TEMP_DIR"
 
 rm -rf "$TEMP_DIR" || true
 
-git worktree add "$TEMP_DIR" "origin/$REPLIT_BRANCH"
+git worktree add --allow-untracked-keys "$TEMP_DIR" "origin/$REPLIT_BRANCH"
 
 
 
