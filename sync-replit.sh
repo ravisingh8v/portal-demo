@@ -14,7 +14,7 @@ set -o pipefail
 
 REPLIT_BRANCH="replit"
 
-DEVELOP_BRANCH="develop"
+DEVELOP_BRANCH="develop-for-script"
 
 CLIENT_DIR="client"
 
