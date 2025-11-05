@@ -1,24 +1,42 @@
 #!/usr/bin/env bash
-set -e
+set -e  # stop if any command fails
 
+# --------------------------
+# CONFIG
+# --------------------------
 REPLIT_BRANCH="replit"
-DELETE_PATHS=("server" "drizzle.config.ts" ".replit" "replit.nix")
+DELETE_PATHS=("server" "drizzle.config.ts" ".replit" "replit.nix")  # paths to discard/remove
 
-echo "🔄 Fetching latest from $REPLIT_BRANCH..."
+echo "🔄 Pulling latest from $REPLIT_BRANCH..."
 git fetch origin "$REPLIT_BRANCH"
-
-echo "🔀 Merging $REPLIT_BRANCH into current branch..."
 git merge "origin/$REPLIT_BRANCH" --allow-unrelated-histories --no-edit || true
 
-echo "🧹 Reverting unwanted files/folders to pre-merge state..."
+echo "🧹 Cleaning unwanted files/folders..."
 for path in "${DELETE_PATHS[@]}"; do
-  if git ls-tree -r HEAD --name-only | grep -qx "$path"; then
-    git checkout HEAD^ -- "$path" 2>/dev/null || echo "⚠️  Skipped $path (no previous version)"
-    echo "↩️  Restored $path to pre-merge state"
+  if [ -e "$path" ]; then
+    echo "🗑️  Discarding changes for $path..."
+    
+    # 1️⃣ If it existed before merge, restore to previous state
+    if git ls-tree -r HEAD~1 --name-only | grep -qx "$path"; then
+      git restore --source=HEAD~1 --staged --worktree -- "$path" 2>/dev/null || true
+      echo "↩️  Restored $path to its pre-merge state"
+    else
+      # 2️⃣ If it’s new from Replit (not in previous commit), remove it completely
+      git rm -rf --cached --ignore-unmatch "$path" 2>/dev/null || true
+      rm -rf "$path"
+      echo "🧨 Removed new file/folder: $path"
+    fi
   else
-    echo "ℹ️  $path not tracked previously, removing from working tree"
-    rm -rf "$path"
+    # Even if it’s already deleted, unstage it if Git has it
+    git restore --staged --worktree -- "$path" 2>/dev/null || true
+    git rm -rf --cached --ignore-unmatch "$path" 2>/dev/null || true
   fi
 done
 
-echo "✅ Cleanup complete. Review changes with: git status"
+# Ensure nothing in DELETE_PATHS is staged anymore
+for path in "${DELETE_PATHS[@]}"; do
+  git restore --staged --worktree -- "$path" 2>/dev/null || true
+done
+
+echo "✅ Cleanup complete."
+echo "💡 Run 'git status' to verify — deleted paths should not appear in staged changes."
