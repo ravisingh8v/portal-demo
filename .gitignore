@@ -7,3 +7,4 @@ server
 drizzle.config.ts
 vite.config.ts.*
 *.tar.gz
+.vite
